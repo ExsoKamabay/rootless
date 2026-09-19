@@ -14,13 +14,16 @@ selesai diunduh tidak sama persis.
 
 Arsipnya ada di [Releases](https://github.com/ExsoKamabay/rootless/releases),
 tidak di dalam pohon Git. GitHub menolak file di atas 100 MB lewat push biasa,
-dan tiga dari empat image di sini melewati batas itu.
+dan tiga dari lima image di sini melewati batas itu.
 
 Pola URL unduhannya:
 
 ```
-https://github.com/ExsoKamabay/rootless/releases/download/rootfs-20260913/<nama-file>
+https://github.com/ExsoKamabay/rootless/releases/download/<tag>/<nama-file>
 ```
+
+`<tag>` adalah `rootfs-20260913` untuk image arm64 dan `rootfs-20260920` untuk
+image x86_64.
 
 ## Isi rilis rootfs-20260913
 
@@ -31,12 +34,22 @@ https://github.com/ExsoKamabay/rootless/releases/download/rootfs-20260913/<nama-
 | `kali-nethunter-rootfs-minimal-arm64.tar.xz` | 137 MB | arm64-v8a | Kali NetHunter 2026.2, varian minimal |
 | `kali-nethunter-rootfs-full-arm64.tar.xz` | 1,8 GB | arm64-v8a | Kali NetHunter 2026.2, varian full |
 
-Semuanya arm64. Itu satu-satunya ABI yang didukung dracxterm, karena biner
-proot dan busybox bawaannya hanya dibangun untuk arm64-v8a.
+Keempatnya untuk arm64-v8a, ABI yang dipakai ponsel.
+
+## Isi rilis rootfs-20260920
+
+| File | Ukuran | ABI | Asal |
+|---|---|---|---|
+| `debian-trixie-amd64-lxc-20260919.tar.xz` | 93 MB | x86_64 | Debian 13 (trixie) amd64, build `20260919_05:24` dari images.linuxcontainers.org |
+| `debian-trixie-amd64-lxc-20260919.SHA256SUMS` | 743 B | - | `SHA256SUMS` asli build itu |
+| `debian-trixie-amd64-lxc-20260919.SHA256SUMS.asc` | 833 B | - | tanda tangan GPG linuxcontainers untuk berkas di atas |
+
+dracxterm berjalan di x86_64 sejak versi 1.0.5, untuk emulator Android,
+WayDroid, dan ChromeOS. Di katalog aplikasi entri ini masih ditandai uji coba.
 
 ## Memeriksa unduhan
 
-Digest keempat file ada di [`SHA256SUMS`](SHA256SUMS). Setelah mengunduh,
+Digest kelima image ada di [`SHA256SUMS`](SHA256SUMS). Setelah mengunduh,
 jalankan di direktori yang sama:
 
 ```bash
@@ -47,7 +60,21 @@ Tiga digest Kali bisa dicocokkan ulang dengan berkas yang diterbitkan Kali
 sendiri di
 `https://kali.download/nethunter-images/kali-2026.2/rootfs/SHA256SUMS`.
 
-Digest Debian tidak bisa dicocokkan ke sumber lain lagi. File itu dipin
+Digest image x86_64 tetap bisa ditelusuri ke linuxcontainers walaupun build
+aslinya sudah dirotasi keluar dari server mereka. Dua berkas pendampingnya
+disalin apa adanya dari direktori build itu, hanya namanya yang diganti, dan
+tanda tangan GPG tidak bergantung pada nama berkas:
+
+```bash
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys E7FB0CAEC8173D669066514CBAEFF88C22F6E216
+gpg --verify debian-trixie-amd64-lxc-20260919.SHA256SUMS.asc debian-trixie-amd64-lxc-20260919.SHA256SUMS
+grep ' rootfs.tar.xz$' debian-trixie-amd64-lxc-20260919.SHA256SUMS
+```
+
+Kunci itu milik "LXC pre-built images". Baris `rootfs.tar.xz` yang tercetak
+memuat digest yang sama dengan `debian-trixie-amd64-lxc-20260919.tar.xz`.
+
+Digest Debian arm64 tidak bisa dicocokkan ke sumber lain lagi. File itu dipin
 dracxterm sejak versi 1.0.0, waktu itu diambil dari `easycli.sh`. Operator situs
 tersebut menghentikan hosting, dan URL lamanya sekarang menjawab 302 ke `/`
 dengan pesan 43 byte. Byte yang sama masih tersimpan di sini, dan digestnya
@@ -61,9 +88,13 @@ Dua sumber upstream dracxterm bermasalah dengan cara yang berbeda.
 `images.linuxcontainers.org`, hanya menyimpan build bertanggal sekitar tiga
 hari, jadi URL yang dipin berhenti resolve begitu build itu dirotasi keluar.
 Build `20260904_05:24` yang dipakai dracxterm 1.0.1 sampai 1.0.3 sudah 404.
+Entri x86_64 kena hal yang sama sebelum sempat dirilis: build amd64
+`20260913_05:24` yang dipakai selama pengembangan 1.0.5 sudah 404 pada
+2026-09-20.
 
-Mirror ini menghapus kedua masalah tersebut. Byte yang disajikan tetap sama,
-jadi digest yang dipin di dalam APK tidak berubah.
+Mirror ini menghapus kedua masalah tersebut. Untuk image arm64 byte yang
+disajikan tetap sama, jadi digest yang dipin di dalam APK tidak berubah. Image
+x86_64 memakai build yang lebih baru, dan digestnya dipin mulai dracxterm 1.0.5.
 
 ## Lisensi
 
